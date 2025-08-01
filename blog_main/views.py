@@ -4,6 +4,7 @@ from . forms import RegistrationForm
 from django.contrib.auth import authenticate
 from django.contrib import auth
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib import messages
 
 
 def home(request):
@@ -23,7 +24,8 @@ def register(request):
         form =RegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('register')
+            messages.success(request, "Registration successful. You can now log in.")
+            return redirect('login')
     else:
         form=RegistrationForm()
     context={
@@ -40,7 +42,10 @@ def login(request):
             user=auth.authenticate(username=username,password=password)
             if user is not None:
                 auth.login(request,user)
+                messages.success(request, "Login successful")
                 return redirect('dashboard')
+            else:
+                messages.error(request, "Invalid username or password.")
             
     else:
         form=AuthenticationForm()
@@ -51,4 +56,5 @@ def login(request):
 
 def logout(request):
     auth.logout(request)
+    messages.success(request, "You have been logged out successfully.")
     return redirect('home')
